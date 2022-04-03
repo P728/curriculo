@@ -22,12 +22,6 @@ body {
     background-attachment: fixed;
     background-position: center;
 }
-.scroller {
-    overflow: auto;
-    margin: 0 30px;
-    display: inline-block;
-    padding: 15px;
-}
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
