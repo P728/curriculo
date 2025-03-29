@@ -10,16 +10,15 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
     document.getElementById('generated-image').src = ''; // Limpa imagem anterior
 
     try {
-        // Chama a API de geração de imagens (substitua pela sua API real)
+        // Substitua com a URL da sua API de Text to Image
         const response = await fetch('https://api.deepai.org/api/text2img', {
             method: 'POST',
             headers: {
-                'Api-Key': 'SUA_API_KEY_AQUI', // Substitua pela sua chave de API
+                'Api-Key': 'fa51bc7c-c34b-4993-be26-5bc7eb8f9c06', // Substituímos pela chave fornecida
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                text: description,
-                style: 'line_art' // Defina o estilo como line art, caso o modelo da API suporte isso
+                text: description
             })
         });
 
