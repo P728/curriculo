@@ -23,18 +23,6 @@
             font-size: 16px;
             color: #666;
         }
-        #generateButton {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-        }
-        #generateButton:hover {
-            background-color: #45a049;
-        }
     </style>
 </head>
 <body>
@@ -44,8 +32,6 @@
 
     <input type="file" id="imageUpload" accept="image/*">
     <br><br>
-    <button id="generateButton" disabled>GERAR</button> <!-- Botão GERAR -->
-    <br><br>
     <canvas id="canvas" style="display:none;"></canvas>
     <img id="output" alt="Imagem Estilizada" style="display: none;">
     
@@ -53,7 +39,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
     <script>
         let model;
-        let uploadedImage;
 
         // Função para carregar o modelo de estilização do TensorFlow Hub
         async function loadModel() {
@@ -99,17 +84,10 @@
             if (file) {
                 const img = new Image();
                 img.onload = () => {
-                    uploadedImage = img;
-                    document.getElementById('generateButton').disabled = false; // Habilita o botão "GERAR"
+                    // Aplicar a transferência de estilo após a imagem ser carregada
+                    stylizeImage(img);
                 };
                 img.src = URL.createObjectURL(file);
-            }
-        });
-
-        // Aplique o estilo ao clicar no botão "GERAR"
-        document.getElementById('generateButton').addEventListener('click', () => {
-            if (uploadedImage) {
-                stylizeImage(uploadedImage);
             }
         });
     </script>
