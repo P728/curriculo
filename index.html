@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estilo Ghibli com Transferência de Estilo</title>
+    <title>Transferência de Estilo Ghibli</title>
     <style>
         body {
             text-align: center;
@@ -16,16 +16,24 @@
             max-width: 100%;
             max-height: 500px;
         }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Estilo Ghibli com Transferência de Estilo</h1>
+    <h1>Transferência de Estilo Ghibli</h1>
+    <p>Carregue uma imagem e aplique o estilo de ilustração do Studio Ghibli!</p>
 
     <input type="file" id="imageUpload" accept="image/*">
-    <br>
-    <img id="output" alt="Imagem Estilizada">
-
+    <br><br>
+    <img id="output" alt="Imagem Estilizada" style="display: none;">
+    
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
     <script>
@@ -33,13 +41,47 @@
 
         // Função para carregar o modelo de estilização do TensorFlow Hub
         async function loadModel() {
-            model = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization-v1-256/1/default/1', {fromTFHub: true});
-            console.log("Modelo carregado com sucesso!");
+            try {
+                model = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization-v1-256/1/default/1', {fromTFHub: true});
+                console.log("Modelo carregado com sucesso!");
+            } catch (error) {
+                console.error("Erro ao carregar o modelo:", error);
+            }
         }
 
+        // Carregar o modelo assim que a página for carregada
         loadModel();
 
         // Função para aplicar a transferência de estilo na imagem
         async function stylizeImage(image) {
-            const tensor = tf.browser.fromPixels(image);
-            const styl
+            try {
+                const tensor = tf.browser.fromPixels(image);
+                const stylizedImage = await model.executeAsync(tensor.expandDims(0));
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = stylizedImage.shape[1];
+                canvas.height = stylizedImage.shape[0];
+                tf.browser.toPixels(stylizedImage.squeeze(), canvas);
+                document.getElementById('output').src = canvas.toDataURL();
+                document.getElementById('output').style.display = 'block';
+            } catch (error) {
+                console.error("Erro ao aplicar a transferência de estilo:", error);
+            }
+        }
+
+        // Manipular o upload da imagem
+        document.getElementById('imageUpload').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const img = new Image();
+                img.onload = () => {
+                    // Aplicar a transferência de estilo após a imagem ser carregada
+                    stylizeImage(img);
+                };
+                img.src = URL.createObjectURL(file);
+            }
+        });
+    </script>
+
+</body>
+</html>
