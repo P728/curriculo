@@ -4,36 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transferência de Estilo Ghibli</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        #image-upload {
-            margin: 20px;
-        }
-        #loading {
-            display: none;
-            margin-top: 20px;
-        }
-        #output {
-            margin-top: 20px;
-        }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 2s linear infinite;
-            margin: auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Transferência de Estilo Ghibli</h1>
@@ -43,93 +14,17 @@
     <input type="file" id="image-upload" accept="image/*">
 
     <!-- Indicador de carregamento -->
-    <div id="loading" class="spinner"></div>
+    <div id="loading" class="spinner" style="display: none;"></div>
 
     <!-- Espaço para a imagem original -->
-    <div id="output">
-        <h2>Imagem Original</h2>
-        <canvas id="canvas-original"></canvas>
-    </div>
+    <h2>Imagem Original</h2>
+    <canvas id="canvas-original"></canvas>
 
-    <!-- Espaço para a imagem transformada -->
-    <div id="output">
-        <h2>Imagem Estilizada</h2>
-        <canvas id="canvas-stylized"></canvas>
-    </div>
+    <!-- Espaço para a imagem estilizada -->
+    <h2>Imagem Estilizada</h2>
+    <canvas id="canvas-stylized"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script>
-        // Carregar o modelo de transferência de estilo
-        const MODEL_URL = "https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization-v1-256/1/default/1";
-        let model;
-
-        // Carregar o modelo TensorFlow.js
-        async function loadModel() {
-            model = await tf.loadGraphModel(MODEL_URL, {fromTFHub: true});
-        }
-
-        // Função para aplicar a transferência de estilo
-        async function applyStyle(image) {
-            // Mostrar o carregamento
-            document.getElementById('loading').style.display = 'block';
-
-            // Converter a imagem para tensor e normalizar
-            const tensorImage = tf.browser.fromPixels(image).toFloat();
-            const normalizedImage = tensorImage.div(tf.scalar(255));
-
-            // Definir a imagem de estilo
-            const styleImage = await loadStyleImage();
-
-            // Aplicar a transferência de estilo
-            const stylizedImage = await model.stylize(normalizedImage, styleImage);
-
-            // Exibir imagem estilizada no canvas
-            const outputCanvas = document.getElementById('canvas-stylized');
-            await tf.browser.toPixels(stylizedImage, outputCanvas);
-
-            // Esconder o carregamento
-            document.getElementById('loading').style.display = 'none';
-        }
-
-        // Carregar a imagem de estilo (pode ser uma imagem específica do Ghibli)
-        async function loadStyleImage() {
-            const styleImage = new Image();
-            styleImage.src = 'https://example.com/ghibli-style.jpg';  // Substitua por uma URL real de imagem de estilo
-            await new Promise(resolve => {
-                styleImage.onload = resolve;
-            });
-            return tf.browser.fromPixels(styleImage).toFloat().div(tf.scalar(255));
-        }
-
-        // Função para lidar com o upload de imagem
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const image = new Image();
-                    image.src = e.target.result;
-                    image.onload = function() {
-                        // Exibir a imagem original no canvas
-                        const originalCanvas = document.getElementById('canvas-original');
-                        originalCanvas.width = image.width;
-                        originalCanvas.height = image.height;
-                        const ctx = originalCanvas.getContext('2d');
-                        ctx.drawImage(image, 0, 0);
-
-                        // Aplicar o estilo após a imagem carregar
-                        applyStyle(image);
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Adicionar evento para carregar a imagem
-        document.getElementById('image-upload').addEventListener('change', handleImageUpload);
-
-        // Carregar o modelo quando a página carregar
-        loadModel();
-    </script>
+    <script src="scripts.js"></script>
 </body>
 </html>
