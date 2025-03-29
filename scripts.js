@@ -1,67 +1,41 @@
-// URL do modelo de transferência de estilo
-const MODEL_URL = "https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization-v1-256/1/default/1";
-
-// Carregar o modelo
-let model;
-async function loadModel() {
-    model = await tf.loadGraphModel(MODEL_URL, {fromTFHub: true});
-}
-
-// Função para aplicar a transferência de estilo
-async function applyStyle(imageElement) {
-    // Mostrar o carregamento
-    document.getElementById('loading').style.display = 'block';
-
-    // Converter a imagem para tensor e normalizar
-    const tensorImage = tf.browser.fromPixels(imageElement).toFloat();
-    const normalizedImage = tensorImage.div(tf.scalar(255));
-
-    // Definir a imagem de estilo (vamos usar uma imagem fixa para esse exemplo)
-    const styleImage = new Image();
-    styleImage.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Sen_to_Chihiro_no_Kamikakushi_logo.svg/330px-Sen_to_Chihiro_no_Kamikakushi_logo.svg.png';  // Exemplo de imagem de estilo
-    await new Promise(resolve => {
-        styleImage.onload = resolve;
-    });
-
-    const styleTensor = tf.browser.fromPixels(styleImage).toFloat().div(tf.scalar(255));
-
-    // Aplicar a transformação de estilo
-    const stylizedImage = await model.stylize(normalizedImage, styleTensor);
-
-    // Exibir a imagem estilizada no canvas
-    const outputCanvas = document.getElementById('canvas-stylized');
-    await tf.browser.toPixels(stylizedImage, outputCanvas);
-
-    // Esconder o indicador de carregamento
-    document.getElementById('loading').style.display = 'none';
-}
-
-// Função para lidar com o upload de imagem
-function handleImageUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const image = new Image();
-            image.src = e.target.result;
-            image.onload = function() {
-                // Exibir a imagem original no canvas
-                const originalCanvas = document.getElementById('canvas-original');
-                originalCanvas.width = image.width;
-                originalCanvas.height = image.height;
-                const ctx = originalCanvas.getContext('2d');
-                ctx.drawImage(image, 0, 0);
-
-                // Aplicar o estilo após a imagem carregar
-                applyStyle(image);
-            }
-        };
-        reader.readAsDataURL(file);
+document.getElementById('generate-btn').addEventListener('click', async () => {
+    const description = document.getElementById('description').value;
+    if (!description.trim()) {
+        alert("Por favor, forneça uma descrição!");
+        return;
     }
-}
 
-// Adicionar evento para carregar a imagem
-document.getElementById('image-upload').addEventListener('change', handleImageUpload);
+    // Exibe a mensagem de carregamento
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('generated-image').src = ''; // Limpa imagem anterior
 
-// Carregar o modelo quando a página carregar
-loadModel();
+    try {
+        // Chama a API de geração de imagens (substitua pela sua API real)
+        const response = await fetch('https://api.deepai.org/api/text2img', {
+            method: 'POST',
+            headers: {
+                'Api-Key': 'SUA_API_KEY_AQUI', // Substitua pela sua chave de API
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: description,
+                style: 'line_art' // Defina o estilo como line art, caso o modelo da API suporte isso
+            })
+        });
+
+        const data = await response.json();
+
+        if (data && data.output_url) {
+            // Exibe a imagem gerada
+            document.getElementById('generated-image').src = data.output_url;
+        } else {
+            alert('Erro ao gerar imagem. Tente novamente.');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Ocorreu um erro ao processar a imagem.');
+    } finally {
+        // Esconde a mensagem de carregamento
+        document.getElementById('loading').classList.add('hidden');
+    }
+});
