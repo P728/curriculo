@@ -1,187 +1,93 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transferência de Estilo Arbitrária</title>
-  <style>
-    /* Estilos básicos para a página */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    .upload-section {
-      margin-bottom: 20px;
-    }
-    .upload-section input {
-      margin: 0 10px;
-    }
-    .images-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    .images-container div {
-      text-align: center;
-    }
-    img, canvas {
-      max-width: 300px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-  </style>
-  <!-- Carrega TensorFlow.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transferência de Estilo Ghibli</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin-top: 20px;
+        }
+        #output {
+            margin-top: 20px;
+            border: 2px solid #ddd;
+            padding: 10px;
+            display: none;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
 </head>
 <body>
-  <h1>Transferência de Estilo Arbitrária</h1>
-  
-  <div class="upload-section">
-    <label>Imagem de Conteúdo:
-      <input type="file" id="content-upload" accept="image/*" />
-    </label>
-    <label>Imagem de Estilo:
-      <input type="file" id="style-upload" accept="image/*" />
-    </label>
-    <button id="apply-style">Aplicar Estilo</button>
-  </div>
 
-  <div class="images-container">
-    <div>
-      <h2>Conteúdo</h2>
-      <img id="content-image" src="" alt="Imagem de Conteúdo" />
+    <h1>Transferência de Estilo Ghibli</h1>
+    <p>Carregue uma imagem e aplique o estilo de ilustração do Studio Ghibli!</p>
+    
+    <!-- File input for the user to select an image -->
+    <input type="file" id="imageInput" accept="image/*">
+    
+    <!-- Display the image -->
+    <div id="output">
+        <h2>Resultado:</h2>
+        <img id="outputImage" src="" alt="Imagem estilizada">
     </div>
-    <div>
-      <h2>Estilo</h2>
-      <img id="style-image" src="" alt="Imagem de Estilo" />
-    </div>
-    <div>
-      <h2>Resultado</h2>
-      <canvas id="result-canvas"></canvas>
-    </div>
-  </div>
 
-  <script>
-    // URLs e elementos
-    const contentUpload = document.getElementById('content-upload');
-    const styleUpload = document.getElementById('style-upload');
-    const applyStyleButton = document.getElementById('apply-style');
-    const contentImgElement = document.getElementById('content-image');
-    const styleImgElement = document.getElementById('style-image');
-    const resultCanvas = document.getElementById('result-canvas');
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/arbitrary-image-stylization"></script>
+    <script>
+        // URL do modelo com suporte a CORS
+        const modelUrl = 'https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization-v1-256/1';
+        
+        // Carregar o modelo do TensorFlow
+        let styleModel;
 
-    let contentImage = null;
-    let styleImage = null;
+        async function loadModel() {
+            styleModel = await tf.loadGraphModel(modelUrl, { fromTFHub: true });
+            console.log("Modelo de estilo carregado com sucesso!");
+        }
 
-    // Carrega a imagem de conteúdo
-    contentUpload.addEventListener('change', event => {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        contentImage = new Image();
-        contentImage.src = e.target.result;
-        contentImage.onload = () => {
-          contentImgElement.src = contentImage.src;
-        };
-      };
-      reader.readAsDataURL(file);
-    });
+        // Função para carregar e processar a imagem do usuário
+        async function applyStyle(imageElement) {
+            const imgTensor = tf.browser.fromPixels(imageElement);
+            const stylizedImage = await styleModel.stylize(imgTensor);
+            const canvas = document.createElement('canvas');
+            tf.browser.toPixels(stylizedImage, canvas).then(() => {
+                const outputImage = document.getElementById('outputImage');
+                outputImage.src = canvas.toDataURL(); // Exibe a imagem estilizada
+                document.getElementById('output').style.display = 'block'; // Mostra a área de resultado
+            });
+        }
 
-    // Carrega a imagem de estilo
-    styleUpload.addEventListener('change', event => {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        styleImage = new Image();
-        styleImage.src = e.target.result;
-        styleImage.onload = () => {
-          styleImgElement.src = styleImage.src;
-        };
-      };
-      reader.readAsDataURL(file);
-    });
+        // Carregar a imagem quando o usuário selecionar uma
+        document.getElementById('imageInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const imgElement = new Image();
+                imgElement.src = e.target.result;
+                
+                imgElement.onload = async function() {
+                    await applyStyle(imgElement); // Aplica o estilo
+                }
+            }
 
-    // Função para converter uma imagem (elemento HTMLImageElement) para um tensor normalizado [0, 1]
-    async function imageToTensor(imageElement) {
-      // Cria um canvas temporário para garantir que a imagem esteja pronta
-      const canvas = document.createElement('canvas');
-      canvas.width = imageElement.width;
-      canvas.height = imageElement.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(imageElement, 0, 0);
-      // Cria um tensor a partir dos pixels e normaliza para [0, 1]
-      return tf.browser.fromPixels(canvas).toFloat().div(tf.scalar(255)).expandDims();
-    }
-
-    // Carrega o modelo de transferência de estilo do TensorFlow Hub
-    async function loadStylizationModel() {
-      const modelUrl = 'https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization/1/default/1';
-      return await tf.loadGraphModel(modelUrl, { fromTFHub: true });
-    }
-
-    // Função principal para aplicar a transferência de estilo
-    applyStyleButton.addEventListener('click', async () => {
-      if (!contentImage || !styleImage) {
-        alert("Por favor, envie as duas imagens.");
-        return;
-      }
-
-      applyStyleButton.disabled = true;
-      applyStyleButton.innerText = 'Processando...';
-
-      try {
-        // Converte as imagens para tensores
-        const contentTensor = await imageToTensor(contentImage);
-        const styleTensor = await imageToTensor(styleImage);
-
-        // Carrega o modelo (caso ainda não tenha sido carregado, pode ser cacheado para uso futuro)
-        const model = await loadStylizationModel();
-        console.log("Modelo carregado.");
-
-        // O modelo espera os tensores com os nomes "content_image" e "style_image"
-        const stylizedTensor = await model.executeAsync({
-          'content_image': contentTensor,
-          'style_image': styleTensor
+            reader.readAsDataURL(file);
         });
 
-        // A saída é um tensor com shape [1, height, width, 3]; remova o batch dimension
-        const outputTensor = stylizedTensor.squeeze();
+        // Inicializar o modelo ao carregar a página
+        window.onload = loadModel;
+    </script>
 
-        // Exiba o resultado no canvas
-        resultCanvas.width = outputTensor.shape[1];
-        resultCanvas.height = outputTensor.shape[0];
-        await tf.browser.toPixels(outputTensor, resultCanvas);
-
-        // Libere a memória dos tensores
-        contentTensor.dispose();
-        styleTensor.dispose();
-        stylizedTensor.dispose();
-        outputTensor.dispose();
-
-      } catch (error) {
-        console.error("Erro ao aplicar a transferência de estilo:", error);
-        alert("Ocorreu um erro ao processar as imagens. Veja o console para detalhes.");
-      } finally {
-        applyStyleButton.disabled = false;
-        applyStyleButton.innerText = 'Aplicar Estilo';
-      }
-    });
-  </script>
 </body>
 </html>
