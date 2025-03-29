@@ -1,22 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerar Ilustração</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Ilustrações Line Art</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="main-container">
-    <div class="center-box">
-      <input type="text" id="input-text" placeholder="Digite o que você quer desenhar..." />
-      <button id="generate-btn">Gerar</button>
-      <div id="loader" class="loader" style="display:none;">Gerando...</div>
-      <div id="illustration-container" class="illustration-container" style="display:none;">
-        <canvas id="canvas"></canvas>
-      </div>
+
+    <h1>Gerador de Ilustrações Line Art</h1>
+    <div id="input-container">
+        <input type="text" id="input-text" placeholder="Digite um objeto ou animal...">
+        <button id="generate-btn">Gerar Ilustração</button>
     </div>
-  </div>
-  <script src="script.js"></script>
+
+    <div id="loader">
+        <p>Carregando...</p>
+    </div>
+
+    <div id="illustration-container"></div>
+
+    <script src="script.js"></script>
 </body>
 </html>
