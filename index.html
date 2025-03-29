@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerar Desenho em Line Art</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerar Ilustração</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Crie um Desenho em Line Art</h1>
-        <textarea id="description" placeholder="Descreva o desenho em detalhes..."></textarea>
-        <button id="generate-btn">Gerar Desenho</button>
-        <div id="loading" class="hidden">Gerando...</div>
-        <div id="result">
-            <img id="generated-image" src="" alt="Desenho em Line Art">
-        </div>
+  <div class="main-container">
+    <div class="center-box">
+      <input type="text" id="input-text" placeholder="Digite o que você quer desenhar..." />
+      <button id="generate-btn">Gerar</button>
+      <div id="loader" class="loader" style="display:none;">Gerando...</div>
+      <div id="illustration-container" class="illustration-container" style="display:none;">
+        <canvas id="canvas"></canvas>
+      </div>
     </div>
-    <script src="script.js"></script>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
