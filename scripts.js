@@ -15,8 +15,8 @@ document.getElementById('generate-btn').addEventListener('click', async function
     loader.style.display = 'block';
     illustrationContainer.style.display = 'none';
 
-    // Enviar solicitação para DeepAI para gerar a imagem (com estilo line art)
     try {
+        // Enviar solicitação para DeepAI para gerar a imagem (com estilo line art)
         const response = await fetch('https://api.deepai.org/api/text2img', {
             method: 'POST',
             headers: {
@@ -26,17 +26,28 @@ document.getElementById('generate-btn').addEventListener('click', async function
                 'text': inputText + " line art" // Garantir que a descrição seja interpretada como line art
             })
         });
-        const data = await response.json();
-        const imageUrl = data.output_url;
 
-        // Exibir a imagem gerada
-        imageElement.src = imageUrl;
-        illustrationContainer.innerHTML = '';
-        illustrationContainer.appendChild(imageElement);
-        loader.style.display = 'none';
-        illustrationContainer.style.display = 'block';
+        if (!response.ok) {
+            throw new Error('Erro ao conectar com a API DeepAI');
+        }
+
+        const data = await response.json();
+
+        if (data && data.output_url) {
+            const imageUrl = data.output_url;
+
+            // Exibir a imagem gerada
+            imageElement.src = imageUrl;
+            illustrationContainer.innerHTML = '';
+            illustrationContainer.appendChild(imageElement);
+            loader.style.display = 'none';
+            illustrationContainer.style.display = 'block';
+        } else {
+            throw new Error('Não foi possível gerar a imagem');
+        }
+
     } catch (error) {
         loader.style.display = 'none';
-        alert('Erro ao gerar imagem. Tente novamente!');
+        alert(`Erro: ${error.message}`);
     }
 });
