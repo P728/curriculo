@@ -1,40 +1,39 @@
-document.getElementById('generate-btn').addEventListener('click', async () => {
-    const description = document.getElementById('description').value;
-    if (!description.trim()) {
-        alert("Por favor, forneça uma descrição!");
-        return;
+document.getElementById('generate-btn').addEventListener('click', function() {
+  const inputText = document.getElementById('input-text').value;
+  const loader = document.getElementById('loader');
+  const illustrationContainer = document.getElementById('illustration-container');
+  const canvas = document.getElementById('canvas');
+  
+  if (!inputText.trim()) {
+    alert("Por favor, digite algo!");
+    return;
+  }
+
+  // Exibir o carregamento e ocultar a ilustração anterior
+  loader.style.display = 'block';
+  illustrationContainer.style.display = 'none';
+
+  // Criar um efeito de animação na ilustração
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Iniciar uma animação (geração de ilustração fictícia)
+  let drawProgress = 0;
+  
+  function animateDrawing() {
+    if (drawProgress < 100) {
+      drawProgress += 2; // Acelera a animação
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#4CAF50';
+      ctx.fillRect(50, 50, drawProgress * 2, 20); // Exemplo de um "desenho" sendo feito
+      requestAnimationFrame(animateDrawing);
+    } else {
+      loader.style.display = 'none';
+      illustrationContainer.style.display = 'block';
     }
+  }
 
-    // Exibe a mensagem de carregamento
-    document.getElementById('loading').classList.remove('hidden');
-    document.getElementById('generated-image').src = ''; // Limpa imagem anterior
-
-    try {
-        // Substitua com a URL da sua API de Text to Image
-        const response = await fetch('https://api.deepai.org/api/text2img', {
-            method: 'POST',
-            headers: {
-                'Api-Key': 'fa51bc7c-c34b-4993-be26-5bc7eb8f9c06', // Substituímos pela chave fornecida
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                text: description
-            })
-        });
-
-        const data = await response.json();
-
-        if (data && data.output_url) {
-            // Exibe a imagem gerada
-            document.getElementById('generated-image').src = data.output_url;
-        } else {
-            alert('Erro ao gerar imagem. Tente novamente.');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('Ocorreu um erro ao processar a imagem.');
-    } finally {
-        // Esconde a mensagem de carregamento
-        document.getElementById('loading').classList.add('hidden');
-    }
+  // Começar a animação
+  animateDrawing();
 });
