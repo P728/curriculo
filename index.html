@@ -3,91 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transferência de Estilo Ghibli</title>
+    <title>Estilo Ghibli com Transferência de Estilo</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            padding: 20px;
             text-align: center;
+            padding: 20px;
         }
-        input[type="file"] {
-            margin-top: 20px;
+        #imageUpload {
+            margin-bottom: 20px;
         }
         #output {
-            margin-top: 20px;
-            border: 2px solid #ddd;
-            padding: 10px;
-            display: none;
-        }
-        img {
             max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 10px auto;
+            max-height: 500px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Transferência de Estilo Ghibli</h1>
-    <p>Carregue uma imagem e aplique o estilo de ilustração do Studio Ghibli!</p>
-    
-    <!-- File input for the user to select an image -->
-    <input type="file" id="imageInput" accept="image/*">
-    
-    <!-- Display the image -->
-    <div id="output">
-        <h2>Resultado:</h2>
-        <img id="outputImage" src="" alt="Imagem estilizada">
-    </div>
+    <h1>Estilo Ghibli com Transferência de Estilo</h1>
+
+    <input type="file" id="imageUpload" accept="image/*">
+    <br>
+    <img id="output" alt="Imagem Estilizada">
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/arbitrary-image-stylization"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
     <script>
-        // URL do modelo com suporte a CORS
-        const modelUrl = 'https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization-v1-256/1';
-        
-        // Carregar o modelo do TensorFlow
-        let styleModel;
+        let model;
 
+        // Função para carregar o modelo de estilização do TensorFlow Hub
         async function loadModel() {
-            styleModel = await tf.loadGraphModel(modelUrl, { fromTFHub: true });
-            console.log("Modelo de estilo carregado com sucesso!");
+            model = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization-v1-256/1/default/1', {fromTFHub: true});
+            console.log("Modelo carregado com sucesso!");
         }
 
-        // Função para carregar e processar a imagem do usuário
-        async function applyStyle(imageElement) {
-            const imgTensor = tf.browser.fromPixels(imageElement);
-            const stylizedImage = await styleModel.stylize(imgTensor);
-            const canvas = document.createElement('canvas');
-            tf.browser.toPixels(stylizedImage, canvas).then(() => {
-                const outputImage = document.getElementById('outputImage');
-                outputImage.src = canvas.toDataURL(); // Exibe a imagem estilizada
-                document.getElementById('output').style.display = 'block'; // Mostra a área de resultado
-            });
-        }
+        loadModel();
 
-        // Carregar a imagem quando o usuário selecionar uma
-        document.getElementById('imageInput').addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const imgElement = new Image();
-                imgElement.src = e.target.result;
-                
-                imgElement.onload = async function() {
-                    await applyStyle(imgElement); // Aplica o estilo
-                }
-            }
-
-            reader.readAsDataURL(file);
-        });
-
-        // Inicializar o modelo ao carregar a página
-        window.onload = loadModel;
-    </script>
-
-</body>
-</html>
+        // Função para aplicar a transferência de estilo na imagem
+        async function stylizeImage(image) {
+            const tensor = tf.browser.fromPixels(image);
+            const styl
