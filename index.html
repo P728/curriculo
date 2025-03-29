@@ -23,28 +23,14 @@
             font-size: 16px;
             color: #666;
         }
-        #generateButton {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-        }
-        #generateButton:hover {
-            background-color: #45a049;
-        }
     </style>
 </head>
 <body>
 
     <h1>Transferência de Estilo Ghibli</h1>
-    <p>Carregue uma imagem e aplique o estilo de ilustração do Studio Ghibli!</p>
+    <p>Carregue uma imagem e aplique o estilo de ilustração do Studio Ghibli em tempo real!</p>
 
     <input type="file" id="imageUpload" accept="image/*">
-    <br><br>
-    <button id="generateButton" disabled>GERAR</button> <!-- Botão GERAR -->
     <br><br>
     <canvas id="canvas" style="display:none;"></canvas>
     <img id="output" alt="Imagem Estilizada" style="display: none;">
@@ -54,10 +40,11 @@
     <script>
         let model;
         let uploadedImage;
-
+        
         // Função para carregar o modelo de estilização do TensorFlow Hub
         async function loadModel() {
             try {
+                // Usando o modelo do TensorFlow Hub de estilização de imagem
                 model = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/arbitrary-image-stylization-v1-256/1/default/1', {fromTFHub: true});
                 console.log("Modelo carregado com sucesso!");
             } catch (error) {
@@ -71,19 +58,23 @@
         // Função para aplicar a transferência de estilo na imagem
         async function stylizeImage(image) {
             try {
+                // Converta a imagem para tensor
                 const tensor = tf.browser.fromPixels(image);
                 const stylizedImage = await model.executeAsync(tensor.expandDims(0));
                 
+                // Obter o elemento de canvas e desenhar a imagem estilizada nele
                 const canvas = document.getElementById('canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = stylizedImage.shape[1];
                 canvas.height = stylizedImage.shape[0];
                 
-                tf.browser.toPixels(stylizedImage.squeeze(), canvas).then(() => {
-                    const imgElement = document.getElementById('output');
-                    imgElement.src = canvas.toDataURL();
-                    imgElement.style.display = 'block';
-                });
+                // Converter o tensor estilizado para um formato de imagem e desenhá-lo no canvas
+                await tf.browser.toPixels(stylizedImage.squeeze(), canvas);
+
+                // Exibir a imagem estilizada
+                const imgElement = document.getElementById('output');
+                imgElement.src = canvas.toDataURL();
+                imgElement.style.display = 'block';
             } catch (error) {
                 console.error("Erro ao aplicar a transferência de estilo:", error);
             }
@@ -96,18 +87,13 @@
                 const img = new Image();
                 img.onload = () => {
                     uploadedImage = img;
-                    document.getElementById('generateButton').disabled = false;
+                    // Assim que a imagem for carregada, aplicar a transferência de estilo em tempo real
+                    stylizeImage(uploadedImage);
                 };
                 img.src = URL.createObjectURL(file);
             }
         });
 
-        // Aplique o estilo ao clicar no botão "GERAR"
-        document.getElementById('generateButton').addEventListener('click', () => {
-            if (uploadedImage) {
-                stylizeImage(uploadedImage);
-            }
-        });
     </script>
 
 </body>
