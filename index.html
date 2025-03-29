@@ -3,28 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transferência de Estilo Ghibli</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Desenhando em Line Art</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Transferência de Estilo Ghibli</h1>
-    <p>Carregue uma imagem e aplique o estilo de ilustração do Studio Ghibli!</p>
-
-    <!-- Botão de upload de imagem -->
-    <input type="file" id="image-upload" accept="image/*">
-
-    <!-- Indicador de carregamento -->
-    <div id="loading" class="spinner" style="display: none;"></div>
-
-    <!-- Espaço para a imagem original -->
-    <h2>Imagem Original</h2>
-    <canvas id="canvas-original"></canvas>
-
-    <!-- Espaço para a imagem estilizada -->
-    <h2>Imagem Estilizada</h2>
-    <canvas id="canvas-stylized"></canvas>
-
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="scripts.js"></script>
+    <div class="container">
+        <h1>Crie Desenhos em Line Art</h1>
+        <textarea id="description" placeholder="Descreva o desenho que você quer gerar..."></textarea>
+        <button id="generate-btn">Gerar Desenho</button>
+        <div id="loading" class="hidden">Gerando...</div>
+        <div id="result">
+            <img id="generated-image" src="" alt="Desenho em Line Art">
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
