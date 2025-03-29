@@ -1,69 +1,64 @@
-* {
-    box-sizing: border-box;
-}
-
+/* Estilo de layout inspirado no Google */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
 
-.container {
-    text-align: center;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 80%;
-    max-width: 600px;
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
-h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
+.center-box {
+  text-align: center;
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 300px;
 }
 
-textarea {
-    width: 80%;
-    height: 100px;
-    margin-bottom: 20px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 button:hover {
-    background-color: #45a049;
+  background-color: #45a049;
 }
 
-#loading {
-    font-size: 18px;
-    color: #ff9800;
-    margin-top: 20px;
+.loader {
+  font-size: 20px;
+  color: #4CAF50;
+  font-weight: bold;
 }
 
-#result img {
-    margin-top: 20px;
-    max-width: 100%;
-    max-height: 400px;
+.illustration-container {
+  margin-top: 20px;
 }
 
-.hidden {
-    display: none;
+canvas {
+  width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
 }
